@@ -6,6 +6,14 @@ namespace Sample.Serialization
     {
         public override string ConvertName(string name)
         {
+            return name.ToSnakeCaseNoSpan();
+        }
+    }
+
+    public class SnakeCaseNamingPolicySpan : JsonNamingPolicy
+    {
+        public override string ConvertName(string name)
+        {
             return name.ToSnakeCase();
         }
     }

@@ -6,8 +6,8 @@ namespace Sample.Benchmarks
     {
         static void Main(string[] args)
         {
-            var strings = BenchmarkRunner.Run<SnakeCaseBenchmarks>();
-            //var summary = BenchmarkRunner.Run<Benchmarks>();
+            //var strings = BenchmarkRunner.Run<SnakeCaseBenchmarks>();
+            var summary = BenchmarkRunner.Run<Benchmarks>();
         }
     }
 }

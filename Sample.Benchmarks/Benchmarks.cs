@@ -47,21 +47,24 @@ namespace Sample.Benchmarks
             }
         };
         
-        private static readonly DefaultContractResolver _contractResolver = new DefaultContractResolver
+        private static readonly DefaultContractResolver ContractResolver = new DefaultContractResolver
         {
             NamingStrategy = new SnakeCaseNamingStrategy()
         };
         
         private readonly JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings
         {
-            ContractResolver = _contractResolver
+            ContractResolver = ContractResolver
         };
         
         private readonly JsonSerializerOptions _options = new JsonSerializerOptions
         {
-            AllowTrailingCommas = true,
-            WriteIndented = true,
             PropertyNamingPolicy = new Serialization.SnakeCaseNamingPolicy()
+        };
+        
+        private readonly JsonSerializerOptions _spanOptions = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = new Serialization.SnakeCaseNamingPolicySpan()
         };
         
         [Benchmark]
@@ -77,11 +80,18 @@ namespace Sample.Benchmarks
             var result = System.Text.Json.JsonSerializer.Serialize(_booking, _options);
             return result;
         }
+        
+        [Benchmark]
+        public string SerializeWithSystemTextJsonSpan()
+        {
+            var result = System.Text.Json.JsonSerializer.Serialize(_booking, _spanOptions);
+            return result;
+        }
 
         [Benchmark]
         public Booking DeserializeWithNewtonsoft()
         {
-            var result = JsonConvert.DeserializeObject<Booking>(JsonBooking);
+            var result = JsonConvert.DeserializeObject<Booking>(JsonBooking, _jsonSerializerSettings);
             return result;
         }
 
@@ -89,6 +99,13 @@ namespace Sample.Benchmarks
         public Booking DeserializeWithSystemTextJson()
         {
             var result = System.Text.Json.JsonSerializer.Deserialize<Booking>(JsonBooking, _options);
+            return result;
+        }
+        
+        [Benchmark]
+        public Booking DeserializeWithSystemTextJsonSpan()
+        {
+            var result = System.Text.Json.JsonSerializer.Deserialize<Booking>(JsonBooking, _spanOptions);
             return result;
         }
     }

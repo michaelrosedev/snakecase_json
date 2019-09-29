@@ -7,14 +7,21 @@ namespace Sample.Tests
 {
     public class Tests
     {
-        private Booking _booking;
-        private string _jsonBooking;
         private JsonSerializerOptions _options;
 
         [SetUp]
         public void Setup()
         {
-            _booking = new Booking
+            _options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = new Serialization.SnakeCaseNamingPolicy()
+            };
+        }
+
+        [Test]
+        public void CanSerializeObjectToJson()
+        {
+            var booking = new Booking
             {
                 BookingDate = new DateTimeOffset(2019, 06, 23, 22, 00, 00, TimeSpan.FromHours(1)),
                 Id = "af43ea6f-b3ff-4640-9a9a-dbfc7544a4a4",
@@ -33,8 +40,17 @@ namespace Sample.Tests
                     Id = "7ce13464-a9df-4630-a50b-7fdd8a3661c4"
                 }
             };
+            var json = JsonSerializer.Serialize(booking, _options);
+            Assert.That(
+                json.Contains("booking_date"),
+                Is.EqualTo(true)
+            );
+        }
 
-            _jsonBooking = @"{
+        [Test]
+        public void CanDeserializeJsonToObject()
+        {
+            const string JsonBooking = @"{
                 ""id"": ""4f9ca774-81b9-4296-a35e-b31b96cedfb7"",
                 ""title"": ""Sample Booking"",
                 ""booking_date"": ""2019-05-06T16:45:00+02:00"",
@@ -50,27 +66,11 @@ namespace Sample.Tests
                     ""email_address"": ""jessica99987@mmail.com""
                   }
                 }";
-
-            _options = new JsonSerializerOptions
-            {
-                AllowTrailingCommas = true,
-                WriteIndented = true,
-                PropertyNamingPolicy = new Serialization.SnakeCaseNamingPolicy()
-            };
-        }
-
-        [Test]
-        public void CanSerializeObjectToJson()
-        {
-            var booking = JsonSerializer.Serialize(_booking, _options);
-            Assert.Pass();
-        }
-
-        [Test]
-        public void CanDeserializeJsonToObject()
-        {
-            var booking = JsonSerializer.Deserialize<Booking>(_jsonBooking, _options);
-            Assert.Pass();
+            var booking = JsonSerializer.Deserialize<Booking>(JsonBooking, _options);
+            Assert.That(
+                booking.Title,
+                Is.EqualTo("Sample Booking")
+            );
         }
     }
 }
